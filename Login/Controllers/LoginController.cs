@@ -26,7 +26,20 @@ namespace Login.Controllers
         [HttpPost]
         public async Task<ActionResult> Entrar(string login, string senha)
         {
+            if(string.IsNullOrEmpty(login) || string.IsNullOrEmpty(senha))
+            {
+                TempData["erro"] = "Os campos não podem estar vazios";
+                return View();
+            }
+
             Entidades.Usuario usuarioLogado = db.USUARIOS.Where(a => a.Login == login && a.Senha == senha).FirstOrDefault();
+
+
+            if(usuarioLogado == null)
+            {
+                TempData["erro"] = "Usuário ou senha inválida";
+                return View();
+            }
 
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Name, usuarioLogado.Nome));
@@ -38,6 +51,15 @@ namespace Login.Controllers
 
 
             return Redirect("/");
+        }
+
+        public async Task<IActionResult> Logoff()
+        {
+
+            await HttpContext.SignOutAsync("CookieAuthentication");
+            ViewData["ReturnUrl"] = "/";
+
+          return Redirect("/Login/Entrar");
         }
     }
 }

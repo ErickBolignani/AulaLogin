@@ -30,6 +30,18 @@ namespace Login.Controllers
         [HttpPost]
         public IActionResult Create(Usuario dadosTela)
         {
+            if (string.IsNullOrEmpty(dadosTela.Login))
+            {
+                TempData["erro"] = "Campo Login não pode estar em branco";
+
+            }
+
+            if (string.IsNullOrEmpty(dadosTela.Senha))
+            {
+                TempData["erro"] = "Campo senha não pode estar em branco";
+                return View();
+            }
+
             db.USUARIOS.Add(dadosTela);
             db.SaveChanges();
             return RedirectToAction("Index");
